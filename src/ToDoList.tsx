@@ -24,17 +24,35 @@ import { useForm } from "react-hook-form";
 // }
 
 function ToDoList() {
-    const { register, watch } = useForm();
-    console.log(watch());
+    const { register, handleSubmit, formState } = useForm();
+    const onValid = (data: any) => {
+        console.log(data);
+    };
+    console.log(formState.errors);
     return (
         <div>
-            <form>
-                <input {...register("email")} placeholder="Email" />
-                <input {...register("firstName")} placeholder="firstName" />
-                <input {...register("lastName")} placeholder="lastName" />
-                <input {...register("username")} placeholder="username" />
-                <input {...register("password")} placeholder="password" />
-                <input {...register("password1")} placeholder="password1" />
+            <form onSubmit={handleSubmit(onValid)}>
+                <input {...register("email", { required: true })} placeholder="Email" />
+                <input
+                    {...register("firstName", { required: true })}
+                    placeholder="firstName"
+                />
+                <input
+                    {...register("lastName", { required: true })}
+                    placeholder="lastName"
+                />
+                <input
+                    {...register("username", { required: true, minLength: 10 })}
+                    placeholder="username"
+                />
+                <input
+                    {...register("password", { required: true })}
+                    placeholder="password"
+                />
+                <input
+                    {...register("password1", { required: "Password is required" })}
+                    placeholder="password1"
+                />
                 <button>Add</button>
             </form>
         </div>
