@@ -3,7 +3,7 @@ import { ReactQueryDevtools } from "react-query/devtools";
 import { darkTheme } from "./theme";
 import { useState } from "react";
 import { useRecoilValue } from "recoil";
-import ToDoList from "./ToDoList";
+import ToDoList from "./components/ToDoList";
 
 const GlobalStyle = createGlobalStyle`
 html, body, div, span, applet, object, iframe,
