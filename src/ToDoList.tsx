@@ -23,16 +23,37 @@ import { useForm } from "react-hook-form";
 //     );
 // }
 
+interface IForm {
+    email: string;
+    firstName: string;
+    lastName: string;
+    username: string;
+    password: string;
+    password1: string;
+}
+
 function ToDoList() {
-    const { register, handleSubmit, formState } = useForm();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<IForm>({
+        defaultValues: {
+            email: "@naver.com"
+        }
+    });
     const onValid = (data: any) => {
         console.log(data);
     };
-    console.log(formState.errors);
+    console.log(errors);
     return (
         <div>
             <form onSubmit={handleSubmit(onValid)}>
-                <input {...register("email", { required: true })} placeholder="Email" />
+                <input
+                    {...register("email", { required: "Emails is required" })}
+                    placeholder="Email"
+                />
+                <span>{errors?.email?.message}</span>
                 <input
                     {...register("firstName", { required: true })}
                     placeholder="firstName"
