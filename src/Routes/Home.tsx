@@ -1,9 +1,10 @@
 import { useQuery } from "react-query";
 import styled from "styled-components";
-import { motion, AnimatePresence, delay } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { getMovies, IGetMoviesResult } from "../api";
 import { makeImagePath } from "../utils";
 import { useState } from "react";
+import { useHistory, useRouteMatch } from "react-router-dom";
 
 const Wrapper = styled.div`
   background: black;
@@ -30,7 +31,7 @@ const Banner = styled.div<{ bgPhoto: string }>`
 
 const Title = styled.h2`
   font-size: 68px;
-  margin-bottom: 20px; ;
+  margin-bottom: 20px;
 `;
 
 const Overview = styled.p`
@@ -58,11 +59,25 @@ const Box = styled(motion.div) <{ bgPhoto: string }>`
   background-position: center center;
   height: 200px;
   font-size: 66px;
-  &:first-child{
+  cursor: pointer;
+  &:first-child {
     transform-origin: center left;
   }
-  &:last-child{
+  &:last-child {
     transform-origin: center right;
+  }
+`;
+
+const Info = styled(motion.div)`
+  padding: 10px;
+  background-color: ${(props) => props.theme.black.lighter};
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  h4 {
+    text-align: center;
+    font-size: 18px;
   }
 `;
 
@@ -84,17 +99,31 @@ const boxVariants = {
     },
     hover: {
         scale: 1.3,
-        y: -50,
+        y: -80,
         transition: {
-            delay: 0.3,
-            type: "tween"
-        }
+            delay: 0.5,
+            duaration: 0.1,
+            type: "tween",
+        },
     },
-}
+};
+
+const infoVariants = {
+    hover: {
+        opacity: 1,
+        transition: {
+            delay: 0.5,
+            duaration: 0.1,
+            type: "tween",
+        },
+    },
+};
 
 const offset = 6;
 
 function Home() {
+    const history = useHistory();
+    const bigMovieMatch = useRouteMatch<{ movieId: string }>("/movies/:movieId");
     const { data, isLoading } = useQuery<IGetMoviesResult>(
         ["movies", "nowPlaying"],
         getMovies
@@ -111,6 +140,9 @@ function Home() {
         }
     };
     const toggleLeaving = () => setLeaving((prev) => !prev);
+    const onBoxClicked = (movieId: number) => {
+        history.push(`/movies/${movieId}`);
+    };
     return (
         <Wrapper>
             {isLoading ? (
@@ -139,17 +171,40 @@ function Home() {
                                     .slice(offset * index, offset * index + offset)
                                     .map((movie) => (
                                         <Box
+                                            layoutId={movie.id + ""}
                                             key={movie.id}
-                                            initial="normal"
                                             whileHover="hover"
+                                            initial="normal"
                                             variants={boxVariants}
                                             transition={{ type: "tween" }}
                                             bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
-                                        />
+                                            onClick={() => onBoxClicked(movie.id)}
+                                        >
+                                            <Info variants={infoVariants}>
+                                                <h4>{movie.title}</h4>
+                                            </Info>
+                                        </Box>
                                     ))}
                             </Row>
                         </AnimatePresence>
                     </Slider>
+                    <AnimatePresence>
+                        {bigMovieMatch ? (
+                            <motion.div
+                                layoutId={bigMovieMatch.params.movieId}
+                                style={{
+                                    position: "absolute",
+                                    width: "40vw",
+                                    height: "80vh",
+                                    backgroundColor: "red",
+                                    top: 50,
+                                    left: 0,
+                                    right: 0,
+                                    margin: "0 auto",
+                                }}
+                            />
+                        ) : null}
+                    </AnimatePresence>
                 </>
             )}
         </Wrapper>
